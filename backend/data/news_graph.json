@@ -1,0 +1,37 @@
+{
+  "name": "News Website Network",
+  "description": "Major news websites and their linking patterns",
+  "nodes": [
+    "CNN.com",
+    "BBC.com",
+    "NYTimes.com",
+    "Reuters.com",
+    "Guardian.com",
+    "WashingtonPost.com",
+    "Bloomberg.com",
+    "Forbes.com",
+    "TheHill.com",
+    "Politico.com"
+  ],
+  "edges": [
+    ["CNN.com", "Reuters.com"],
+    ["CNN.com", "Politico.com"],
+    ["BBC.com", "Reuters.com"],
+    ["BBC.com", "Guardian.com"],
+    ["NYTimes.com", "WashingtonPost.com"],
+    ["NYTimes.com", "Reuters.com"],
+    ["NYTimes.com", "Politico.com"],
+    ["Reuters.com", "Bloomberg.com"],
+    ["Guardian.com", "BBC.com"],
+    ["Guardian.com", "NYTimes.com"],
+    ["WashingtonPost.com", "NYTimes.com"],
+    ["WashingtonPost.com", "Politico.com"],
+    ["Bloomberg.com", "Forbes.com"],
+    ["Bloomberg.com", "Reuters.com"],
+    ["Forbes.com", "Bloomberg.com"],
+    ["TheHill.com", "Politico.com"],
+    ["TheHill.com", "WashingtonPost.com"],
+    ["Politico.com", "CNN.com"],
+    ["Politico.com", "NYTimes.com"]
+  ]
+}

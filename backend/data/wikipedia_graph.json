@@ -1,0 +1,31 @@
+{
+  "name": "Wikipedia Pages Network",
+  "description": "A realistic web page linking structure from Wikipedia",
+  "nodes": [
+    "Python_(programming)",
+    "Machine_Learning",
+    "Artificial_Intelligence",
+    "Deep_Learning",
+    "Neural_Networks",
+    "Data_Science",
+    "TensorFlow",
+    "Statistics"
+  ],
+  "edges": [
+    ["Python_(programming)", "Machine_Learning"],
+    ["Python_(programming)", "Data_Science"],
+    ["Machine_Learning", "Artificial_Intelligence"],
+    ["Machine_Learning", "Deep_Learning"],
+    ["Machine_Learning", "Statistics"],
+    ["Deep_Learning", "Neural_Networks"],
+    ["Deep_Learning", "TensorFlow"],
+    ["Deep_Learning", "Artificial_Intelligence"],
+    ["Neural_Networks", "Machine_Learning"],
+    ["Data_Science", "Machine_Learning"],
+    ["Data_Science", "Statistics"],
+    ["TensorFlow", "Deep_Learning"],
+    ["TensorFlow", "Python_(programming)"],
+    ["Artificial_Intelligence", "Machine_Learning"],
+    ["Statistics", "Data_Science"]
+  ]
+}

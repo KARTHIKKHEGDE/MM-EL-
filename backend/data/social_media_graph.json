@@ -1,0 +1,37 @@
+{
+  "name": "Social Media Network",
+  "description": "Social media platforms and tech company references",
+  "nodes": [
+    "Facebook",
+    "Twitter",
+    "Instagram",
+    "LinkedIn",
+    "YouTube",
+    "TikTok",
+    "Reddit",
+    "Pinterest",
+    "Snapchat",
+    "Discord"
+  ],
+  "edges": [
+    ["Facebook", "Instagram"],
+    ["Facebook", "Twitter"],
+    ["Twitter", "Facebook"],
+    ["Twitter", "LinkedIn"],
+    ["Twitter", "Reddit"],
+    ["Instagram", "Facebook"],
+    ["Instagram", "TikTok"],
+    ["LinkedIn", "Twitter"],
+    ["LinkedIn", "Facebook"],
+    ["YouTube", "Twitter"],
+    ["YouTube", "Instagram"],
+    ["YouTube", "TikTok"],
+    ["TikTok", "Instagram"],
+    ["TikTok", "YouTube"],
+    ["Reddit", "Twitter"],
+    ["Reddit", "YouTube"],
+    ["Pinterest", "Instagram"],
+    ["Snapchat", "Instagram"],
+    ["Discord", "Reddit"]
+  ]
+}
