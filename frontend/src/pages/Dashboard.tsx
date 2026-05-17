@@ -3,6 +3,7 @@ import { fetchPageRank, fetchCustomPageRank, listGraphs, PageRankResponse, Graph
 import RankChart from '../components/RankChart';
 import ConvergenceChart from '../components/ConvergenceChart';
 import CustomGraphInput from '../components/CustomGraphInput';
+import InteractivePageRank from '../components/InteractivePageRank';
 
 export default function Dashboard() {
   const [data, setData] = useState<PageRankResponse | null>(null);
@@ -337,6 +338,23 @@ export default function Dashboard() {
           ⏳ Recalculating PageRank...
         </div>
       )}
+
+      <div style={{
+        background: '#0f1322',
+        borderRadius: '14px',
+        padding: '20px',
+        marginBottom: '25px',
+        border: '1px solid rgba(255,255,255,0.08)'
+      }}>
+        <h3 style={{ margin: '0 0 10px 0', color: '#e9ecf8' }}>
+          Interactive PageRank Simulator
+        </h3>
+        <p style={{ margin: '0 0 16px 0', color: '#aab2c8', fontSize: '14px' }}>
+          Add sites, connect links, drag nodes, and step through iterations to see
+          the probability flow.
+        </p>
+        <InteractivePageRank />
+      </div>
 
       {/* Charts */}
       <div style={{ display: 'grid', gridTemplateColumns: '1fr', gap: '25px' }}>

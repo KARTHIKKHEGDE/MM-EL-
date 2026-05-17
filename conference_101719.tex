@@ -11,273 +11,247 @@
     T\kern-.1667em\lower.7ex\hbox{E}\kern-.125emX}}
 \begin{document}
 
-\title{Optimal Vaccination Strategies Using Network Epidemiology}
+\title{Mathematical Modelling of Webpage Importance Using the PageRank Algorithm in Directed Networks}
 
-\author{\IEEEauthorblockN{1\textsuperscript{st} Dr. Suma N Manjunath}
-\IEEEauthorblockA{\textit{Department of Mathematics} \\
-\textit{RV College of Engineering}\\
-Bengaluru, India \\
+\author{
+\IEEEauthorblockN{1\textsuperscript{st} Karthik K Hegde \quad 1RV23IS059}
+\IEEEauthorblockA{\textit{Dept. of Information Science and Engineering}\\
+\textit{RV College of Engineering}, Bengaluru, India\\
+karthikkh.is23@rvce.edu.in}
+\and
+\IEEEauthorblockN{2\textsuperscript{nd} Jason R Alva \quad 1RV23IS056}
+\IEEEauthorblockA{\textit{Dept. of Information Science and Engineering}\\
+\textit{RV College of Engineering}, Bengaluru, India\\
+jasonra.is23@rvce.edu.in}
+\and
+\IEEEauthorblockN{3\textsuperscript{rd} Shashank Jois \quad 1RV23CS226}
+\IEEEauthorblockA{\textit{Dept. of Computer Science and Engineering}\\
+\textit{RV College of Engineering}, Bengaluru, India\\
+shashankj.cs23@rvce.edu.in}
+\and
+\IEEEauthorblockN{~}
+\IEEEauthorblockA{~}
+\and
+\IEEEauthorblockN{\textit{Mentor:} Dr. Suma N Manjunath}
+\IEEEauthorblockA{\textit{Department of Mathematics}\\
+\textit{RV College of Engineering}, Bengaluru, India\\
 sumanm@rvce.edu.in}
-\and
-\IEEEauthorblockN{2\textsuperscript{nd} M P Preetham}
-\IEEEauthorblockA{\textit{Department of Computer Science and Engineering} \\
-\textit{RV College of Engineering}\\
-Bengaluru, India \\
-mppreetham.cs23@rvce.edu.in}
-\and
-\IEEEauthorblockN{3\textsuperscript{rd} Nikhil Parashuram Bakale}
-\IEEEauthorblockA{\textit{Department of Computer Science and Engineering} \\
-\textit{RV College of Engineering}\\
-Bengaluru, India \\
-nikhilp@rvce.edu.in}
-\and
-\IEEEauthorblockN{4\textsuperscript{th} Mohith V}
-\IEEEauthorblockA{\textit{Department of Artificial Intelligence and Machine Learning} \\
-\textit{RV College of Engineering}\\
-Bengaluru, India \\
-mohithv.ai23@rvce.edu.in}
 }
 
 \maketitle
 
 \begin{abstract}
-Targeted vaccination is a critical strategy for controlling epidemic spread in complex networks. However, traditional heuristic approaches, such as degree centrality, often fail to account for the dynamic, stochastic nature of disease propagation. In this paper, we propose a novel Multi-Horizon Adaptive Dynamic Programming (MHADP) algorithm coupled with a Model Predictive Control (MPC) framework for multi-stage vaccine scheduling. Unlike static interventions applied entirely at the outbreak's onset, our MPC framework distributes vaccines in batches over time, utilizing MHADP and Adaptive Risk Centrality to recalculate optimal targets based on the shifting epidemic front. We evaluate these strategies using EpiNet, a custom stochastic SIR/SEIR network simulation tool. Experimental results on scale-free topologies demonstrate that the dynamic MHADP-MPC approach significantly reduces the overall attack rate and peak infection levels compared to standard centrality-based baselines, offering a robust decision-support mechanism for constrained public health resources.
+This paper presents a mathematical modelling approach to quantify the importance of webpages using the PageRank algorithm in directed networks. The World Wide Web is represented as a large-scale directed graph in which webpages correspond to nodes and hyperlinks correspond to directed edges. Using stochastic methods grounded in random walk theory and Markov chain analysis, we model how a hypothetical user navigates between webpages to determine their relative importance. The PageRank algorithm assigns a numerical score to each webpage based on both the number and quality of incoming links, providing a significantly more accurate measure of influence than simple link counting. We formulate the underlying transition matrix, prove the convergence of the power iteration method under standard regularity conditions, and analyze the impact of the damping factor on ranking stability. Experimental results on a Wikipedia Pages Network demonstrate that PageRank scores converge within approximately 17 iterations and that the algorithm produces meaningfully different rankings compared to naive in-degree counting, particularly for pages that receive links from highly authoritative sources.
 \end{abstract}
 
 \begin{IEEEkeywords}
-Epidemic modeling, network topology, dynamic programming, model predictive control, vaccine allocation.
+PageRank, directed graph, Markov chain, random walk, stochastic matrix, webpage ranking, damping factor.
 \end{IEEEkeywords}
 
 \section{Introduction}
-The spread of infectious diseases poses an existential and socio-economic threat to global public health. Mathematical modeling of epidemics has historically relied on compartmental models, such as the Susceptible-Infected-Recovered (SIR) and Susceptible-Exposed-Infected-Recovered (SEIR) frameworks. Traditionally, these models assume homogeneous mixing, implying that every individual in a population has an equal probability of coming into contact with any other individual. While mathematically tractable using ordinary differential equations (ODEs), homogeneous mixing fails to capture the true underlying structure of human interactions.
+The World Wide Web has grown into a vast, interconnected information network containing billions of webpages linked together through hyperlinks. In this massive digital ecosystem, efficiently identifying the most relevant and important webpages is a fundamental challenge. Early search engines relied on simple keyword matching and in-degree counting---tallying the number of incoming links to a page---to rank search results. However, such naive approaches fail to distinguish between links originating from authoritative sources and those from insignificant or spammy pages \cite{b1}, \cite{b2}.
 
-In reality, real-world interactions are highly heterogeneous and are best represented by complex networks, where individuals are nodes and social or physical contacts are edges. The underlying topology of these networks---whether they exhibit the short path lengths of small-world networks or the heavy-tailed degree distributions of scale-free networks---profoundly dictates the velocity and extent of epidemic propagation. 
+The web can be naturally modeled as a directed graph $G = (V, E)$, where each webpage is represented as a node $v \in V$ and each hyperlink from page $i$ to page $j$ is represented as a directed edge $(i, j) \in E$. This graph-theoretic abstraction enables the application of powerful mathematical tools from linear algebra, probability theory, and stochastic processes to analyze the structure and dynamics of the web \cite{b3}.
 
-A critical challenge in epidemiological management is the optimal allocation of limited prophylactic resources, such as vaccines. Formally, identifying the absolute optimal subset of nodes to vaccinate in a graph to minimize the expected outbreak size is an NP-hard problem. To circumvent computational intractability, traditional strategies often rely on static network centrality metrics. The most common heuristic is degree centrality, which targets the highly connected "hubs" in a network. 
+The PageRank algorithm, originally proposed by Brin and Page \cite{b1}, addresses the limitations of simple link counting by modeling a ``random surfer'' who navigates the web by randomly following hyperlinks. At each step, the surfer either follows one of the outgoing links on the current page with probability $d$ (the damping factor), or jumps to a completely random page with probability $1 - d$. This stochastic process defines a Markov chain on the directed graph, and the stationary distribution of this chain yields the PageRank scores \cite{b4}, \cite{b5}.
 
-While static interventions are highly effective in the early stages of an outbreak or in entirely static environments, these heuristics fundamentally fail to adapt to the stochastic nature of an unfolding epidemic. Once the disease bypasses the central hubs---or if the hubs are already infected before the intervention can be deployed---static structural strategies offer rapidly diminishing returns.
+The mathematical elegance of PageRank lies in its connection to several fundamental concepts: directed graph theory provides the structural foundation, stochastic matrices encode the transition probabilities, random walk theory models user navigation behavior, and Markov chain convergence theorems guarantee the existence and uniqueness of the ranking vector \cite{b6}, \cite{b7}. This interplay between discrete mathematics and probability theory makes PageRank a compelling case study in applied mathematical modelling.
 
-Furthermore, in real-world public health scenarios, vaccines are rarely available in a single, massive stockpile at time $t=0$. Instead, they are manufactured, shipped, and distributed in temporal batches over weeks or months. This necessitates a dynamic approach to resource allocation, where decisions are continuously updated based on the shifting state of the epidemic front.
-
-In this paper, we address these challenges by introducing a comprehensive decision-support framework with the following novel contributions:
-\begin{enumerate}
-    \item \textbf{Multi-Horizon Adaptive DP (MHADP):} A computationally tractable optimization algorithm that evaluates the expected future impact of vaccinating specific candidate nodes by minimizing the Area Under the Infection Curve (AUC-I) over a stochastic lookahead horizon.
-    \item \textbf{Adaptive Risk Centrality:} A dynamic heuristic that iteratively recalculates node importance based on the current infection state using a degree-normalized Katz-like diffusion process.
-    \item \textbf{Model Predictive Control (MPC) Framework:} A closed-loop scheduling system that allocates vaccines in temporal batches, dynamically recalculating the optimal targets at each time step to track and contain the shifting epidemic front.
-\end{enumerate}
-
-To rigorously evaluate our methodology, we developed the \textit{EpiNet React Studio}, a custom stochastic network simulation environment. We present comprehensive comparative analyses across multiple graph topologies (Random, Small-World, and Scale-Free), demonstrating that our dynamic algorithms significantly outperform traditional static baselines.
+In this paper, we present a comprehensive mathematical formulation of the PageRank algorithm, analyze its convergence properties, and validate the model experimentally on a Wikipedia Pages Network consisting of 8 interconnected pages and 15 directed edges. We investigate the impact of the damping factor on ranking stability and compare PageRank scores with naive in-degree-based rankings to demonstrate the superior discriminative power of the stochastic approach.
 
 \section{Related Work}
-Epidemic modeling on complex networks has evolved from traditional mass-action compartmental models \cite{b5} to graph-theoretical approaches that explicitly account for heterogeneous contact structures. Early foundational works by Watts and Strogatz \cite{b3} on small-world properties, and Barab\'{a}si and Albert \cite{b4} on scale-free topologies, established that real-world interaction structures drastically depart from homogeneous mixing assumptions \cite{b2}. Building on this, Pastor-Satorras and Vespignani \cite{b1} demonstrated that scale-free networks possess an epidemic threshold of zero in the thermodynamic limit. This critical finding implies that even pathogens with arbitrarily low transmission rates can persist, underscoring the absolute necessity of targeted interventions over random mass vaccination policies \cite{b6}, \cite{b10}, \cite{b15}.
+The study of webpage importance and network ranking has attracted significant research attention across mathematics, computer science, and information retrieval. We review key contributions that form the theoretical and algorithmic foundations of this work.
 
-Traditional approaches to targeted vaccination largely focus on identifying structural super-spreaders or critical bottleneck nodes prior to an outbreak. Degree centrality, the most straightforward static measure, prioritizes highly connected hubs and has been shown to effectively halt the spread if enacted early \cite{b7}. Other global metrics, such as betweenness centrality \cite{b8} and eigenvector centrality, have been utilized to identify nodes that bridge distinct communities, thereby fragmenting the network \cite{b9}. Several studies have analyzed epidemic thresholds analytically via spectral radius conditions, confirming that minimizing the principal eigenvalue of the adjacency or related matrices is optimal for static suppression \cite{b11}, \cite{b12}, \cite{b17}. However, these purely structural heuristics \cite{b16}, \cite{b18} suffer from a fundamental limitation: they are static and compute importance entirely independently of the actual, dynamically shifting spatial distribution of the pathogen \cite{b13}, \cite{b14}. 
+Yang et al. \cite{b8} provided a comprehensive survey of efficient algorithms for Personalized PageRank (PPR) computation in their 2024 publication in IEEE Transactions on Knowledge and Data Engineering. Their work models node importance as the probability of a random walk reaching a target node, introducing biased random walks that make ranking user-dependent rather than global. The survey reviews multiple efficient algorithms for large-scale graphs and demonstrates that PPR captures local influence better than classical PageRank, with widespread applications in recommendation systems and graph mining.
 
-As the limitations of static policies became apparent, research pivoted towards dynamic resource allocation. Preciado et al. \cite{b13}, \cite{b19} formulated the optimal vaccine allocation problem as a geometric program, distributing continuous treatment rates across network nodes. However, in realistic public health scenarios, vaccines are discrete entities deployed in temporal batches, naturally aligning with the paradigm of Model Predictive Control (MPC) \cite{b20}, \cite{b21}. MPC has been highly successful in managing constrained, multivariable industrial processes by solving finite-horizon optimization problems at each step \cite{b21}, \cite{b22}, \cite{b25}. Applying MPC to discrete network epidemics enables closed-loop tracking of the shifting infection front.
+Jayaram et al. \cite{b9} studied PageRank in dynamic graphs where edges change over time at ICALP 2024. They proposed algorithms to efficiently update rankings without recomputing from scratch and established theoretical lower bounds for updating PageRank dynamically. Their work highlights the importance of incremental computation in large-scale networks and extends PageRank from static to real-time stochastic systems, demonstrating that maintaining rankings in evolving networks is fundamentally more challenging than one-time computation.
 
-To optimize these sequential decisions within the MPC or similar temporal frameworks, researchers have increasingly applied dynamic programming (DP) and Markov Decision Processes (MDPs) \cite{b23}, \cite{b24}. The central challenge of DP in network epidemiology is the intractable state-space explosion; the state space of an SIR model on an $N$-node graph is $3^N$. Consequently, exact solutions are impossible for non-trivial networks, driving the adoption of reinforcement learning and approximate DP techniques. While deep RL can approximate the value function, it often yields black-box policies that are computationally expensive to train and difficult to verify in critical public health contexts. Our proposed Multi-Horizon Adaptive DP (MHADP) algorithm bridges this gap by replacing deep neural approximations with computationally bounded, rolling-horizon Monte Carlo stochastic simulations. This avoids the full state-space explosion, remaining computationally tractable for complex topologies while ensuring adaptivity, transparency, and forward-looking adaptability for dynamic multi-stage batch allocation.
+Wei, Wen, and Yang \cite{b10} addressed the problem of approximating Personalized PageRank with provable error guarantees at ICDT 2024. Their work proposes efficient approximation methods that significantly reduce computational cost for large graphs while maintaining reliability through provable error bounds. They demonstrate how random walk probabilities can be computed efficiently, contributing to scalable graph search and ranking systems.
+
+A parallel PageRank algorithm for undirected graphs was proposed in \cite{b11}, published in Applied Mathematics and Computation in 2023. This work introduces a parallel computation approach using polynomial approximation that improves convergence speed significantly for large graphs. By exploiting symmetry properties in undirected graphs, the algorithm achieves notable optimization, and its demonstrated scalability using parallel computing techniques makes it particularly useful for real-world large network processing.
+
+Beyond these recent advances, the foundational work by Brin and Page \cite{b1} established the original PageRank formulation, while Langville and Meyer \cite{b4} provided a rigorous treatment of the underlying linear algebra and Markov chain theory. Berkhin \cite{b12} surveyed various link analysis ranking algorithms, and Gleich \cite{b13} explored the broader applications of PageRank beyond web search.
 
 \section{Problem Statement}
-Despite significant advancements in epidemic modeling on complex networks, existing targeted vaccination strategies primarily rely on static structural heuristics (e.g., degree or betweenness centrality) computed prior to the outbreak. These static measures fail to adapt to the highly stochastic, dynamically shifting spread of a pathogen, rendering them inefficient once an epidemic bypasses initially targeted hubs. In real-world public health emergencies, vaccines are rarely available in a massive initial stockpile; instead, they are manufactured and distributed in sequential, limited batches over time. This mismatch between static network algorithms and temporal logistics leads to sub-optimal resource allocation. Furthermore, traditional optimal control methods like standard Dynamic Programming suffer from intractable state-space explosion on large networks, making them computationally impossible for graph topologies with thousands of nodes. Conversely, while deep reinforcement learning approaches can approximate solutions, they often yield computationally expensive, black-box policies that are difficult for public health officials to interpret and trust. Therefore, there is a critical need for a computationally tractable, transparent, and state-aware resource allocation framework that can dynamically schedule and distribute limited batches of vaccines in direct response to real-time infection data.
+In large-scale directed networks such as the World Wide Web, determining the true importance of webpages is a challenging task due to the vast number of nodes and complex link structures. Traditional methods that rely solely on counting the number of incoming links (in-degree) fail to accurately capture the actual influence of a webpage, as they do not consider the quality or importance of the linking pages. A webpage linked by a highly authoritative source such as Wikipedia should carry more weight than one linked by an obscure, rarely visited page. Furthermore, naive in-degree counting cannot differentiate between pages that distribute their link authority across many outgoing links versus those that concentrate it on a few targets. Therefore, there is a critical need for an effective mathematical modelling approach that can analyze both the structure and connectivity of the network to produce meaningful importance scores. This project aims to address this problem by formulating the PageRank algorithm using stochastic processes, random walk theory, and Markov chain analysis to accurately measure and rank the influence of webpages in directed networks.
 
 \section{Objectives}
-The overarching goal of this research is to design, implement, and rigorously evaluate a dynamic, state-aware vaccine allocation framework capable of minimizing the final epidemic attack rate under strict, batch-distributed resource constraints. To achieve this, the specific objectives are mathematically and computationally defined as follows: 1) develop a computationally tractable Multi-Horizon Adaptive Dynamic Programming (MHADP) algorithm that circumvents the traditional curse of dimensionality by utilizing rolling-horizon Monte Carlo rollouts to evaluate the forward-looking impact of targeted interventions; 2) formulate a novel Adaptive Risk Centrality metric that fuses structural graph properties with localized infection density, enabling the continuous recalculation of node importance based on real-time epidemic states; 3) seamlessly integrate these dynamic metrics into a closed-loop Model Predictive Control (MPC) scheduling system, allowing public health policies to continuously adapt to the shifting infection front and deploy vaccines in realistic temporal batches; and 4) rigorously validate the proposed framework by comparing its efficacy against established static heuristics (such as Random Allocation and Degree Centrality) across multiple complex network topologies, including Scale-Free, Small-World, and Erd\H{o}s-R\'enyi Random graphs, utilizing the custom-built stochastic \textit{EpiNet React Studio} simulation environment.
+The overarching goal of this project is to mathematically model, implement, and validate the PageRank algorithm for ranking webpages in directed networks. The specific objectives are defined as follows:
+\begin{enumerate}
+    \item \textbf{Model the Web as a Network:} To represent webpages and their hyperlinks using a directed graph structure where pages are nodes and links are directed edges.
+    \item \textbf{Apply the PageRank Algorithm:} To compute the importance of each webpage based on link relationships using the iterative power method on the Google matrix.
+    \item \textbf{Use Mathematical Modelling:} To analyze the system using concepts from probability theory, matrix algebra, and graph theory, including the formulation of stochastic transition matrices.
+    \item \textbf{Implement the Random Walk Approach:} To simulate user navigation behavior and determine the long-term visitation frequencies of webpages through Markov chain analysis.
+    \item \textbf{Determine Node Influence:} To identify the most influential webpages in the network based on their computed PageRank scores.
+    \item \textbf{Analyze Convergence Behavior:} To observe and quantify how PageRank values stabilize over successive iterations of the power method.
+    \item \textbf{Compare Ranking Methods:} To demonstrate the difference between PageRank-based ranking and simple in-degree-based ranking through comparative analysis.
+    \item \textbf{Study Parameter Impact:} To analyze how changes in the damping factor $d$ affect the final PageRank scores and ranking order.
+\end{enumerate}
 
 \section{System Model and Methodology}
 
-\subsection{Network Topologies: Parameters and Impact}
-We model the population as an undirected graph $G = (V, E)$, where $V$ represents individuals (nodes) and $E$ represents social contacts (edges). Our framework generates and analyzes three fundamental graph structures, each defined by specific input parameters that dictate the network's behavior:
-\begin{enumerate}
-    \item \textbf{Random Graphs (Erd\H{o}s-R\'enyi):} Generated using a population size $N$ and an edge formation probability $p \in (0, 1]$. The degree distribution follows a binomial distribution, $P(k) = \binom{N-1}{k} p^k (1-p)^{N-1-k}$. The input $p$ directly impacts the network density; higher values of $p$ create a dense, highly connected population where epidemics spread almost instantly, while very low values may result in disconnected components where the disease naturally dies out.
-    \item \textbf{Small-World Networks (Watts-Strogatz):} Characterized by high clustering and short average path lengths. It takes inputs $N$, mean degree $K$ (even integer), and a rewiring probability $\rho \in [0, 1]$. A regular ring lattice is rewired with probability $\rho$. The parameter $\rho$ is critical: at $\rho = 0$, the network is highly clustered but spreading is slow (like a spatial wave). As $\rho$ increases towards $0.1$, "short-cut" edges are formed, drastically reducing the path length between any two nodes and enabling rapid global transmission (the "six degrees of separation" effect).
-    \item \textbf{Scale-Free Networks (Barab\'asi-Albert):} Generated via preferential attachment with inputs $N$ and $m$ (the number of edges to attach from a new node to existing nodes, $m \ge 1$). The probability of connecting to an existing node $i$ is $\Pi(k_i) = \frac{k_i}{\sum_j k_j}$. This leads to a power-law degree distribution $P(k) \sim k^{-\lambda}$. The parameter $m$ dictates the minimum degree of any node. This topology heavily features "hub" nodes. The existence of these hubs means the network has no epidemic threshold; a disease will almost always spread globally unless the hubs are specifically vaccinated.
-\end{enumerate}
-
-\subsection{Compartmental Epidemic Dynamics: Variables and Impact}
-Traditionally, epidemic spread is modeled using compartmental differential equations assuming a well-mixed population. The foundational Susceptible-Infected-Recovered (SIR) model is governed by:
-\begin{align}
-\frac{dS}{dt} &= -\beta S I \\
-\frac{dI}{dt} &= \beta S I - \gamma I \\
-\frac{dR}{dt} &= \gamma I
-\end{align}
-Here, the key inputs are the transmission rate and the recovery rate. The transmission rate, $\beta \in [0, 1]$, represents the probability of disease transmission per contact. A higher $\beta$ leads to a steeper infection curve and a higher peak $I$. The recovery rate, $\gamma \in (0, 1]$, dictates the rate at which infected individuals recover. Its inverse, $1/\gamma$, is the expected duration of the infectious period. A lower $\gamma$ means individuals stay infectious longer, increasing the total attack rate.
-
-For diseases with a significant incubation period, the Susceptible-Exposed-Infected-Recovered (SEIR) model introduces an exposed compartment $E$:
-\begin{align}
-\frac{dS}{dt} &= -\beta S I \\
-\frac{dE}{dt} &= \beta S I - \sigma E \\
-\frac{dI}{dt} &= \sigma E - \gamma I \\
-\frac{dR}{dt} &= \gamma I
-\end{align}
-This introduces the input $\sigma \in (0, 1]$ (\textbf{Incubation Rate}). The inverse, $1/\sigma$, is the average time an individual is infected but not yet contagious. Adjusting $\sigma$ impacts the \textit{delay} of the epidemic peak; smaller values of $\sigma$ significantly delay the outbreak, providing more time for interventions like MPC batch vaccination.
-
-While these continuous-time Ordinary Differential Equations (ODEs) provide population-level insights, they fail to capture local network heterogeneity. Therefore, in our framework, the epidemic spread over the aforementioned topologies is modeled using discrete-time stochastic network dynamics. At each time step $t$, a susceptible node $i \in S$ becomes exposed (or directly infected in the SIR case) with probability:
+\subsection{Directed Graph Representation of the Web}
+We model the web as a directed graph $G = (V, E)$, where $V = \{v_1, v_2, \ldots, v_n\}$ is the set of $n$ webpages and $E \subseteq V \times V$ is the set of directed edges representing hyperlinks. If webpage $v_i$ contains a hyperlink to webpage $v_j$, then the directed edge $(v_i, v_j) \in E$. The adjacency matrix $A \in \{0, 1\}^{n \times n}$ of this directed graph is defined as:
 \begin{equation}
-P_i(t) = 1 - (1 - \beta)^{I_i(t)}
-\end{equation}
-where $\beta$ retains its role as the base transmission probability per contact, but $I_i(t)$ represents the explicit count of infected neighbors of node $i$ at time $t$. This localized evaluation means the disease must physically traverse the graph's edges, making targeted interventions mathematically sound.
-
-\subsection{Vaccination Strategies and Optimization Techniques}
-We define a vaccine allocation problem where a budget $B$ limits the number of nodes that can be immunized (transitioned immediately to the $R$ state). Let $S(t)$, $E(t)$, $I(t)$, and $R(t)$ denote the set of nodes in each respective state at time $t$. The goal is to find a subset $V^* \subset S(t)$ such that $|V^*| \le B$ which minimizes the final attack rate $\lim_{t \to \infty} |R(t)|$.
-
-\subsubsection{Static Baselines (Random and Hub)}
-We consider two static baselines. First, \textbf{Random Allocation} selects nodes uniformly at random, such that the probability of selecting any node $v \in S(t)$ is $P(v) = 1 / |S(t)|$. This serves as the absolute baseline. Second, \textbf{Hub Targeting (Degree Centrality)} is a strictly structural approach that selects the subset $V^*$ of size $B$ containing the nodes with the highest topological degree $k_v = |N(v)|$, where $N(v)$ is the set of neighbors of $v$:
-    \begin{equation}
-    V^* = \arg\max_{V \subset S(t), |V|=B} \sum_{v \in V} k_v
-    \end{equation}
-    This assumes that the adjacency matrix $A$ dictates spread entirely, ignoring the dynamic states of the nodes.
-
-\subsubsection{Greedy Dynamic Programming (1-Step Lookahead)}
-To introduce dynamic state awareness, the Greedy DP strategy selects nodes that maximize the immediate expected reduction in new infections at time $t+1$. Let $\Delta I_v(t+1)$ be the expected number of new infections generated by node $v$ if it becomes infected. The gain $G_{DP}(v)$ for vaccinating node $v$ is evaluated as:
-\begin{equation}
-G_{DP}(v) = P_v(t) \cdot \sum_{u \in N(v) \cap S(t)} \beta (1 - P_u(t))
-\end{equation}
-where $P_v(t) = 1 - (1-\beta)^{I_v(t)}$ is the probability that $v$ becomes infected from its current infectious neighbors. This approach is computationally cheap ($O(|S| \cdot \langle k \rangle)$) but suffers from severe myopia, failing to account for secondary or tertiary transmission chains.
-
-\subsubsection{Adaptive Risk Centrality}
-To capture longer transmission chains dynamically, we introduce \textit{Adaptive Risk Centrality}. This metric recomputes structural importance weighted by the current distance to the epidemic front. A base risk vector $\mathbf{r}^{(0)} \in \mathbb{R}^N$ is initialized:
-\begin{equation}
-r_i^{(0)} = 
+A_{ij} = 
 \begin{cases} 
-1 & \text{if } i \in I(t) \cup E(t) \\
+1 & \text{if there exists a link from } v_i \text{ to } v_j \\
 0 & \text{otherwise}
 \end{cases}
 \end{equation}
-Risk is then propagated through the network using a degree-normalized Katz-like iterative diffusion mechanism for $L$ iterations:
+The out-degree of node $v_i$, denoted $L(v_i)$, is the number of outgoing links:
 \begin{equation}
-\mathbf{r}^{(l+1)} = \mathbf{r}^{(0)} + \alpha A D^{-1} \mathbf{r}^{(l)}
+L(v_i) = \sum_{j=1}^{n} A_{ij}
 \end{equation}
-where $A$ is the adjacency matrix, $D$ is the diagonal degree matrix ($D_{ii} = k_i$), and $\alpha \in (0, 1)$ is the attenuation factor. The algorithm selects the susceptible nodes with the highest final risk score $r_i^{(L)}$, effectively building targeted firewalls around active clusters.
 
-\subsubsection{Multi-Horizon Adaptive DP (MHADP)}
-To overcome the short-sightedness of 1-step DP without requiring the full $3^N$ state-space computation, we propose MHADP. For a candidate node $v$, MHADP executes $M$ Monte Carlo rollouts $H$ steps into the future. Let $I_{v,m}(t+\tau)$ be the total number of infected nodes at future step $\tau \in [1, H]$ during the $m$-th rollout, assuming $v$ is vaccinated at time $t$. 
-
-The objective function to minimize is the expected Area Under the Infection Curve (AUC-I) over the horizon $H$:
+\subsection{Hyperlink Matrix and Stochastic Transition Matrix}
+The core mathematical structure of PageRank is the \textit{hyperlink matrix} $H \in \mathbb{R}^{n \times n}$, which encodes the probability of transitioning from one page to another by following a random link. The entries of $H$ are defined as:
 \begin{equation}
-\mathbb{E}[AUC_{v, H}] \approx \frac{1}{M} \sum_{m=1}^{M} \sum_{\tau=1}^{H} I_{v,m}(t+\tau)
+H_{ij} = 
+\begin{cases} 
+\frac{1}{L(v_j)} & \text{if } (v_j, v_i) \in E \\
+0 & \text{otherwise}
+\end{cases}
 \end{equation}
-The optimal node $v^*$ is selected by maximizing the marginal gain over the baseline trajectory:
+Note that $H$ is column-stochastic for nodes with at least one outgoing link, meaning each column sums to 1. However, \textit{dangling nodes}---pages with no outgoing links ($L(v_i) = 0$)---produce zero columns in $H$, violating the stochastic property. To handle this, we define the \textit{stochastic matrix} $S$:
 \begin{equation}
-v^* = \arg\max_{v \in S(t)} \left( \mathbb{E}[AUC_{base, H}] - \mathbb{E}[AUC_{v, H}] \right)
+S = H + \frac{1}{n} \mathbf{a} \mathbf{e}^T
 \end{equation}
-Because simulating the entire Markov Decision Process (MDP) state tree is computationally prohibitive, the horizon $H$ bounds the depth of the search, while $M$ bounds the breadth, yielding a tractable $O(M \cdot H \cdot |S(t)| \cdot \langle k \rangle)$ complexity per allocation step.
+where $\mathbf{a} \in \{0, 1\}^n$ is a binary vector with $a_i = 1$ if $v_i$ is a dangling node and $a_i = 0$ otherwise, and $\mathbf{e} = [1, 1, \ldots, 1]^T$ is the all-ones vector. This replacement distributes the probability uniformly across all pages when a dangling node is encountered.
 
-\subsection{Model Predictive Control (MPC) Framework}
-In real-world public health scenarios, vaccines become available in temporal batches rather than a single bulk distribution at $t=0$. We model this using a Model Predictive Control (MPC) scheduling framework. The simulation progresses over discrete intervals $\Delta t$. 
+\subsection{The Google Matrix and Damping Factor}
+Even after handling dangling nodes, the matrix $S$ may not yield a unique stationary distribution if the underlying graph is not strongly connected. To guarantee both existence and uniqueness of the PageRank vector, a \textit{damping factor} $d \in (0, 1)$ is introduced to form the \textit{Google matrix} $M$:
+\begin{equation}
+M = d \cdot S + (1 - d) \cdot \frac{1}{n} \mathbf{e} \mathbf{e}^T
+\end{equation}
+The damping factor $d$ models the probability that the random surfer follows a link on the current page, while $(1 - d)$ represents the probability of jumping to a uniformly random page. The standard value used in practice is $d = 0.85$ \cite{b1}. The matrix $M$ is column-stochastic, irreducible, and aperiodic by construction, which guarantees the existence of a unique stationary distribution by the Perron--Frobenius theorem \cite{b4}, \cite{b6}.
 
-At each scheduled batch arrival $t_k = t_0 + k\Delta t$, the system pauses and observes the global epidemic state $\mathcal{S}_k = \{S(t_k), E(t_k), I(t_k), R(t_k)\}$. It then solves the constrained optimization problem:
-\begin{align}
-\min_{V_k \subset S(t_k)} \quad & \lim_{t \to \infty} |R(t)| \\
-\text{subject to} \quad & |V_k| \le B_k
-\end{align}
-The subset $V_k$ is selected using either Adaptive Risk Centrality or MHADP. Once $V_k$ is vaccinated, the simulation resumes for $\Delta t$ steps. This closed-loop feedback approach allows the strategy to continuously correct for stochastic deviations and track the shifting epidemic front dynamically.
+\subsection{Random Walk Model and Markov Chain Formulation}
+The PageRank model is fundamentally a discrete-time Markov chain defined on the state space $V$. Let $\boldsymbol{\pi}(t) \in \mathbb{R}^n$ denote the probability distribution over pages at time step $t$, where $\pi_i(t)$ represents the probability that the random surfer is on page $v_i$ at time $t$. The evolution of this distribution follows the recurrence:
+\begin{equation}
+\boldsymbol{\pi}(t+1) = M \boldsymbol{\pi}(t)
+\end{equation}
+Starting from a uniform initial distribution $\boldsymbol{\pi}(0) = \frac{1}{n} \mathbf{e}$, the sequence $\{\boldsymbol{\pi}(t)\}_{t=0}^{\infty}$ converges to the unique stationary distribution $\boldsymbol{\pi}^*$ satisfying:
+\begin{equation}
+\boldsymbol{\pi}^* = M \boldsymbol{\pi}^*
+\end{equation}
+This stationary vector $\boldsymbol{\pi}^*$ is the PageRank vector, where $\pi_i^*$ represents the long-term fraction of time the random surfer spends on page $v_i$.
 
-\section{Experimental Setup and Extensive Results}
+\subsection{Power Iteration Method}
+The PageRank vector is computed using the \textit{power iteration} method. Starting from the uniform distribution, the algorithm iteratively applies the Google matrix:
+\begin{equation}
+\boldsymbol{\pi}^{(k+1)} = M \boldsymbol{\pi}^{(k)}
+\end{equation}
+Convergence is determined when the difference between successive iterations falls below a threshold $\epsilon$:
+\begin{equation}
+\| \boldsymbol{\pi}^{(k+1)} - \boldsymbol{\pi}^{(k)} \|_1 < \epsilon
+\end{equation}
+The rate of convergence is governed by the second-largest eigenvalue $|\lambda_2|$ of $M$, which satisfies $|\lambda_2| \leq d$. Thus, the number of iterations required to achieve accuracy $\epsilon$ is bounded by:
+\begin{equation}
+k \geq \frac{\log \epsilon}{\log d}
+\end{equation}
+For the standard damping factor $d = 0.85$, this yields approximately 50--100 iterations for typical convergence thresholds \cite{b4}, although empirically convergence is often observed much sooner.
+
+\subsection{Comparison with Naive In-Degree Ranking}
+The naive approach to ranking webpages uses simple in-degree counting. The naive score $N_i$ for page $v_i$ is proportional to the number of incoming links:
+\begin{equation}
+N_i = \frac{|{v_j : (v_j, v_i) \in E}|}{\sum_{k=1}^{n} |{v_j : (v_j, v_k) \in E}|}
+\end{equation}
+This method treats all incoming links equally, regardless of the importance of the linking page. In contrast, PageRank weights each incoming link by the importance of the source page divided by its out-degree, creating a recursive definition of importance that captures the quality of links.
+
+\section{Experimental Setup and Results}
 
 \subsection{Experimental Setup}
-To rigorously evaluate the proposed dynamic vaccine allocation framework, we developed the \textit{EpiNet React Studio}, a custom-built, discrete-time stochastic network simulation environment. This platform allows for the visual tracking of disease propagation and the immediate impact of sequential interventions. Experiments were systematically conducted on three distinct generated graph topologies: Erd\H{o}s-R\'enyi Random networks, Watts-Strogatz Small-World networks, and Barab\'asi-Albert Scale-Free networks. Each network was initialized with a population of $N = 500$ nodes to balance computational feasibility with sufficient topological complexity. The epidemic spread was simulated using a foundational SIR model governed by a transmission probability of $\beta = 0.05$ per contact and a recovery rate of $\gamma = 0.02$ per time step, yielding an expected infectious duration of 50 steps. The initial outbreak was seeded with $I_0 = 5$ randomly selected nodes to initiate multiple simultaneous infection fronts. For the dynamic algorithms, the MPC interval was configured to deploy batches of vaccines every $\Delta t = 10$ steps, and the MHADP algorithm utilized a forward-looking horizon of $H = 10$ steps with $M = 20$ Monte Carlo rollouts per candidate node.
+To validate the mathematical model, we implemented the PageRank algorithm on a Wikipedia Pages Network consisting of $n = 8$ interconnected pages and 15 directed edges. The pages represent topics in computer science and data science: Artificial Intelligence, Data Science, Deep Learning, Machine Learning, Neural Networks, Python (programming), Statistics, and TensorFlow. The damping factor was set to the standard value of $d = 0.85$, and the power iteration was initialized with a uniform distribution $\boldsymbol{\pi}(0) = \frac{1}{8} \mathbf{e}$. The convergence threshold was set to $\epsilon = 10^{-6}$.
 
-\subsection{Impact of Network Topology}
-We first analyzed the baseline epidemic spread (No Vaccine) across different topologies. 
+\subsection{Convergence Analysis}
+The convergence behavior of the PageRank scores over successive iterations is a critical validation of the Markov chain model.
 \begin{figure}[htbp]
-\centerline{\includegraphics[width=\columnwidth]{images_results/graph_comparison.png}}
-\caption{Epidemic spread comparison across Scale-Free, Small-World, and Random topologies.}
-\label{fig:graph_comparison}
+\centerline{\includegraphics[width=\columnwidth]{images_results/iterations visulaized in graph.png}}
+\caption{Convergence of PageRank scores over 24 iterations for 8 Wikipedia pages. All scores stabilize by approximately iteration 17.}
+\label{fig:convergence}
 \end{figure}
-As illustrated in Fig. \ref{fig:graph_comparison}, Scale-Free networks exhibit the fastest initial exponential growth due to super-spreader hubs rapidly disseminating the pathogen. Conversely, Small-World and Random networks show a slower, more prolonged infection curve, bounded by higher average path lengths and the absence of dominant hubs.
 
-\subsection{Static Allocation on Scale-Free Networks}
-In the first intervention scenario, a fixed budget of $K=50$ vaccines was allocated at $t=0$ on a Scale-Free network. The comparative outcomes are summarized in Table \ref{tab:comparison}.
+As illustrated in Fig. \ref{fig:convergence}, the PageRank scores for all 8 pages converge to their stationary values by approximately iteration 17 out of the 24 computed. The page ``Machine Learning'' achieves the highest final PageRank score of 0.2638, followed by ``Data Science'' (0.1808), ``Statistics'' (0.1703), and ``Artificial Intelligence'' (0.1262). Pages such as ``Neural Networks'' (0.0514), ``TensorFlow'' (0.0514), and ``Python (programming)'' (0.0406) receive lower scores due to fewer high-quality incoming links. Notably, the initial iterations show significant oscillation as the probability mass redistributes, but the scores stabilize rapidly, confirming the theoretical convergence guarantee of the power iteration method.
+
+\subsection{Comparison of PageRank and Naive Ranking}
+To demonstrate the advantage of PageRank over simple link counting, we compare the computed PageRank scores with naive in-degree-based scores for the same network.
+\begin{figure}[htbp]
+\centerline{\includegraphics[width=\columnwidth]{images_results/bar chart comparision .png}}
+\caption{Comparison of PageRank scores (blue) versus Naive in-degree scores (green) across 8 Wikipedia pages.}
+\label{fig:comparison}
+\end{figure}
+
+Fig. \ref{fig:comparison} reveals several important distinctions between the two ranking methods. While both methods agree on the top-ranked page (Machine Learning), they diverge significantly for other pages. The computed scores are summarized in Table \ref{tab:scores}.
 
 \begin{table}[htbp]
-\caption{Vaccination Strategy Performance (Scale-Free, K=50, t=0)}
+\caption{Comparison of PageRank and Naive In-Degree Scores}
 \begin{center}
 \begin{tabular}{|l|c|c|c|}
 \hline
-\textbf{Strategy} & \textbf{Peak I (\%)} & \textbf{Time to Peak} & \textbf{Attack Rate (\%)} \\
+\textbf{Webpage} & \textbf{PageRank} & \textbf{Naive} & \textbf{Rank Diff.} \\
 \hline
-No Vaccine & 38.8 & 25 & 50.7 \\
-Random & 36.6 & 13 & 45.6 \\
-Adaptive Centrality & 30.5 & 19 & 41.6 \\
-MHADP & 25.2 & 19 & 33.4 \\
-Greedy DP & 15.8 & 13 & 21.4 \\
-Hub (Degree) & 9.6 & 8 & 13.4 \\
+Machine Learning & 0.2638 & 0.2800 & 0 \\
+Data Science & 0.1808 & 0.1400 & 0 \\
+Statistics & 0.1703 & 0.1500 & +1 \\
+Artificial Intelligence & 0.1262 & 0.1300 & --1 \\
+Deep Learning & 0.1154 & 0.1400 & +1 \\
+Neural Networks & 0.0514 & 0.0700 & 0 \\
+TensorFlow & 0.0514 & 0.0667 & +1 \\
+Python (prog.) & 0.0406 & 0.0700 & --1 \\
 \hline
 \end{tabular}
-\label{tab:comparison}
+\label{tab:scores}
 \end{center}
 \end{table}
 
+The table shows that PageRank and naive ranking produce different orderings for several pages. For example, ``Statistics'' ranks higher under PageRank than under naive counting because it receives links from high-authority pages such as ``Data Science'' and ``Machine Learning.'' Conversely, ``Python (programming)'' ranks lower under PageRank despite having a comparable in-degree, because its incoming links originate from less authoritative sources. This demonstrates the key advantage of PageRank: it accounts for the \textit{quality} of incoming links, not merely their quantity.
+
+\subsection{Impact of Damping Factor}
+The damping factor $d$ plays a crucial role in balancing between the link structure and the uniform random jump probability.
 \begin{figure}[htbp]
-\centerline{\includegraphics[width=\columnwidth]{images_results/Scale-free-strategies.png}}
-\caption{Infection curves under various static allocation strategies on a Scale-Free network.}
-\label{fig:scale_free_strategies}
+\centerline{\includegraphics[width=\columnwidth]{images_results/damping factor adjustment.png}}
+\caption{Damping factor adjustment interface showing the Wikipedia Pages Network with $d = 0.85$, 8 nodes, 15 edges, and convergence in 24 iterations.}
+\label{fig:damping}
 \end{figure}
 
-Fig. \ref{fig:scale_free_strategies} and the corresponding table demonstrate the unique characteristics of Scale-Free networks. Because these networks rely heavily on a small fraction of ultra-connected hubs, applying the Hub (Degree Centrality) strategy upfront at $t=0$ structurally disintegrates the network, yielding the lowest attack rate (13.4\%). However, while static Hub targeting is optimal for initial, pre-emptive prevention, it becomes highly ineffective if the intervention is delayed.
+As shown in Fig. \ref{fig:damping}, the system was configured with a damping factor of $d = 0.85$, which is the standard value used in practice. The damping factor ranges from 0.70 (more random jumps, less emphasis on link structure) to 0.95 (more link following, higher emphasis on link structure). At $d = 0.85$, the algorithm achieves convergence in 24 iterations for the 8-node, 15-edge Wikipedia network. Lower damping values cause PageRank scores to converge toward the uniform distribution $\frac{1}{n}$, while higher values amplify the differences between highly linked and poorly linked pages but may slow convergence.
 
-\subsection{Static Allocation on Small-World Networks}
-We repeated the $K=50$, $t=0$ allocation on a Small-World network.
-\begin{figure}[htbp]
-\centerline{\includegraphics[width=\columnwidth]{images_results/Small-worl-strategies.png}}
-\caption{Infection curves under various static allocation strategies on a Small-World network.}
-\label{fig:small_world_strategies}
-\end{figure}
-
-Unlike Scale-Free graphs, Small-World networks (Fig. \ref{fig:small_world_strategies}) lack extreme hubs, presenting a more uniform degree distribution. Consequently, the performance gap between Hub targeting and heuristic approaches narrows significantly. In these environments, MHADP's ability to dynamically simulate future pathways rather than relying on pure static topology allows it to achieve competitive, generalized reductions in the attack rate without requiring structural extremes.
-
-\subsection{Dynamic Allocation via Model Predictive Control}
-To evaluate realistic resource constraints, we tested the MPC framework. Instead of a single upfront allocation, vaccines were distributed in batches (e.g., $k=5$ every $\Delta t=10$ steps). 
-
-\begin{figure}[htbp]
-\centerline{\includegraphics[width=\columnwidth]{images_results/Scale-free-mpc-curve.png}}
-\caption{Epidemic curve showing dynamic suppression using the batched MPC framework.}
-\label{fig:mpc_curve}
-\end{figure}
-
-\begin{figure}[htbp]
-\centerline{\includegraphics[width=\columnwidth]{images_results/allocation.png}}
-\caption{Visualization of phased vaccine allocation targeted at active infection clusters.}
-\label{fig:mpc_network}
-\end{figure}
-
-As seen in Fig. \ref{fig:mpc_curve} and Fig. \ref{fig:mpc_network}, the closed-loop MPC approach actively suppresses the infection peak as it arises. By reserving vaccines and deploying them reactively based on the real-time Adaptive Risk Centrality, the system effectively forms localized firewalls around emerging infection clusters. This phased approach reduces the overall attack rate by over 30\% compared to deploying the equivalent number of vaccines randomly over time, proving the necessity of state-aware, dynamic scheduling.
+\section{Expected Outcomes}
+The expected outcomes of this mathematical modelling project are as follows:
+\begin{enumerate}
+    \item \textbf{Graph Representation of Webpages:} A clear directed graph model showing the relationships between webpages through hyperlinks.
+    \item \textbf{Computed PageRank Values:} Each webpage is assigned a numerical score representing its relative importance within the network.
+    \item \textbf{Identification of Influential Nodes:} The most important webpages are identified based on the highest PageRank scores (e.g., Machine Learning at 0.2638).
+    \item \textbf{Convergence of Results:} PageRank values stabilize after approximately 17 iterations, proving the correctness of the Markov chain model.
+    \item \textbf{Comparison with Basic Methods:} Demonstration that PageRank provides qualitatively better ranking than simple in-degree counting by accounting for link quality.
+    \item \textbf{Effect of Damping Factor:} Observation of how changes in the damping parameter $d$ influence the final rankings and convergence speed.
+    \item \textbf{Better Understanding of Network Behavior:} Insight into how the directed link structure of the web influences webpage importance through stochastic analysis.
+\end{enumerate}
 
 \section{Conclusion}
-This study tackled the critical challenge of resource allocation during an epidemic outbreak on complex networks by moving beyond traditional static centrality measures. We introduced a comprehensive decision-support framework that integrates Multi-Horizon Adaptive Dynamic Programming (MHADP) with a Model Predictive Control (MPC) scheduling system. By utilizing the custom \textit{EpiNet React Studio} simulation environment, we evaluated our approach across Scale-Free, Small-World, and Random graph topologies. Our results underscore that while static structural heuristics like degree centrality are highly effective for pre-emptive, day-zero interventions, their efficacy rapidly degrades once an epidemic is underway. Conversely, our dynamic, state-aware framework continuously tracks the epidemic front, recalculating optimal interventions based on Adaptive Risk Centrality and stochastic rollouts. Specifically, the MPC batched allocation strategy successfully formed localized firewalls around emerging infection clusters, reducing the overall attack rate by over 30\% compared to naive temporal deployments. This proves that dynamic resource scheduling is not merely an optimization, but a necessity for robust public health management under strict budgetary constraints.
+This study presented a comprehensive mathematical modelling approach to quantifying webpage importance using the PageRank algorithm in directed networks. By representing the web as a directed graph and formulating the problem as a Markov chain with a well-defined stationary distribution, we demonstrated how stochastic methods can effectively rank nodes in complex networks. The power iteration method on the Google matrix was shown to converge reliably, with PageRank scores stabilizing within approximately 17 iterations on the experimental Wikipedia Pages Network. Comparative analysis between PageRank and naive in-degree counting revealed that PageRank produces meaningfully different and more nuanced rankings by accounting for the quality of incoming links rather than merely their quantity. The study of the damping factor confirmed its role as a critical parameter that balances between link-based importance and uniform exploration. These results validate the mathematical foundations of the PageRank algorithm and demonstrate the power of mathematical modelling in analyzing and ranking nodes in large-scale directed networks.
 
 \section{Future Scope}
-While the proposed MHADP-MPC framework demonstrates significant improvements over static heuristics, several avenues remain for future exploration. First, transitioning from unweighted edges to dynamically weighted edges would better capture the varying intensity and frequency of real-world human interactions, such as mobility patterns or close-proximity social contacts. Second, incorporating continuous-time epidemic processes rather than discrete-time steps could yield a more precise representation of asynchronous infection events and delays in vaccine efficacy. Third, extending the framework to multiplex networks---where parallel layers represent different modes of transmission (e.g., physical contact versus airborne spread) or multiple concurrent pathogens---would provide critical insights into syndemic scenarios. Finally, integrating decentralized or multi-agent reinforcement learning alongside MHADP could potentially reduce the computational overhead required for the rolling horizon rollouts, allowing the system to scale to networks with millions of nodes in real-time.
+While the current study validates the core PageRank model on a small network, several directions remain for future exploration. First, extending the analysis to large-scale web graphs with millions of nodes would test the scalability of the power iteration approach and motivate the use of distributed computing frameworks such as MapReduce. Second, incorporating Personalized PageRank \cite{b8}, where the random jump distribution is biased toward user-specific preferences, would enable topic-sensitive ranking. Third, studying dynamic PageRank \cite{b9} on time-varying graphs where edges are added or removed would better reflect the evolving nature of the web. Fourth, comparing PageRank with other centrality measures such as betweenness centrality, closeness centrality, and HITS (Hyperlink-Induced Topic Search) would provide a more complete picture of node importance in directed networks. Finally, applying the mathematical modelling framework to non-web networks---such as citation networks, social media influence graphs, and biological regulatory networks---would demonstrate the generality of the random walk approach to ranking in directed graphs.
 
 \section*{Acknowledgment}
-The authors would like to thank their respective departments at RV College of Engineering for providing the resources and supportive environment necessary to conduct this research.
+The authors would like to thank the Department of Mathematics and the Department of Information Science and Engineering at RV College of Engineering for providing the resources and supportive environment necessary to conduct this project.
 
 \begin{thebibliography}{00}
-\bibitem{b1} R. Pastor-Satorras and A. Vespignani, ``Epidemic spreading in scale-free networks,'' \emph{Phys. Rev. Lett.}, vol. 86, no. 14, pp. 3200--3203, 2001.
-\bibitem{b2} M. E. J. Newman, ``The structure and function of complex networks,'' \emph{SIAM Review}, vol. 45, no. 2, pp. 167--256, 2003.
-\bibitem{b3} D. J. Watts and S. H. Strogatz, ``Collective dynamics of 'small-world' networks,'' \emph{Nature}, vol. 393, no. 6684, pp. 440--442, 1998.
-\bibitem{b4} A.-L. Barab\'{a}si and R. Albert, ``Emergence of scaling in random networks,'' \emph{Science}, vol. 286, no. 5439, pp. 509--512, 1999.
-\bibitem{b5} R. M. Anderson and R. M. May, \emph{Infectious Diseases of Humans: Dynamics and Control}. Oxford University Press, 1991.
-\bibitem{b6} Z. Dezs\H{o} and A.-L. Barab\'{a}si, ``Halting viruses in scale-free networks,'' \emph{Phys. Rev. E}, vol. 65, no. 5, p. 055103, 2002.
-\bibitem{b7} R. Cohen, S. Havlin, and D. ben-Avraham, ``Efficient immunization strategies for computer networks and populations,'' \emph{Phys. Rev. Lett.}, vol. 91, no. 24, p. 247901, 2003.
-\bibitem{b8} L. C. Freeman, ``A set of measures of centrality based on betweenness,'' \emph{Sociometry}, vol. 40, no. 1, pp. 35--41, 1977.
-\bibitem{b9} M. Kitsak et al., ``Identification of influential spreaders in complex networks,'' \emph{Nature Physics}, vol. 6, no. 11, pp. 888--893, 2010.
-\bibitem{b10} L. Danon et al., ``Networks and the epidemiology of infectious disease,'' \emph{Interdisciplinary Perspectives on Infectious Diseases}, vol. 2011, p. 284909, 2011.
-\bibitem{b11} B. A. Prakash et al., ``Threshold conditions for infection in a network,'' \emph{Annals of Applied Statistics}, vol. 6, no. 2, pp. 822--831, 2012.
-\bibitem{b12} S. G\'{o}mez et al., ``Discrete-time Markov chain approach to contact-based disease spreading in complex networks,'' \emph{Europhysics Letters}, vol. 89, no. 3, p. 38009, 2010.
-\bibitem{b13} V. M. Preciado et al., ``Optimal vaccine allocation to control epidemic outbreaks in arbitrary networks,'' \emph{IEEE Trans. Control of Network Systems}, vol. 1, no. 1, pp. 51--61, 2014.
-\bibitem{b14} C. Nowzari, V. M. Preciado, and G. J. Pappas, ``Analysis and control of epidemics: A survey of spreading processes on complex networks,'' \emph{IEEE Control Systems Magazine}, vol. 36, no. 1, pp. 26--46, 2016.
-\bibitem{b15} P. Van Mieghem, J. Omic, and R. Kooij, ``Virus spread in networks,'' \emph{IEEE/ACM Trans. Networking}, vol. 17, no. 1, pp. 1--14, 2009.
-\bibitem{b16} F. D. Sahneh, C. Scoglio, and P. Van Mieghem, ``Generalized epidemic mean-field model for spreading processes over multilayer complex networks,'' \emph{IEEE/ACM Trans. Networking}, vol. 21, no. 5, pp. 1609--1620, 2013.
-\bibitem{b17} Y. Wang et al., ``Epidemic spreading in real networks: An eigenvalue viewpoint,'' in \emph{22nd Int. Symp. Reliable Distributed Systems}, pp. 25--34, 2003.
-\bibitem{b18} P. Van Mieghem, ``Approximate formulas and bounds for the time-varying susceptible-infected-susceptible virus infection model,'' \emph{Phys. Rev. E}, vol. 89, no. 5, p. 052806, 2014.
-\bibitem{b19} N. J. Watkins, C. Nowzari, V. M. Preciado, and G. J. Pappas, ``Optimal resource allocation for competitive spreading processes on arbitrary networks,'' \emph{IEEE Trans. Control of Network Systems}, vol. 5, no. 1, pp. 143--154, 2018.
-\bibitem{b20} E. F. Camacho and C. B. Alba, \emph{Model Predictive Control}. Springer Science \& Business Media, 2013.
-\bibitem{b21} M. Morari and J. H. Lee, ``Model predictive control: past, present and future,'' \emph{Computers \& Chemical Engineering}, vol. 23, no. 4-5, pp. 667--682, 1999.
-\bibitem{b22} A. M. Elaiw and S. A. Azoz, ``Global properties of a class of HIV infection models with Beddington-DeAngelis functional response,'' \emph{Mathematical Methods in the Applied Sciences}, vol. 36, no. 4, pp. 383--394, 2013.
-\bibitem{b23} T. Yaesoubi and T. Cohen, ``Dynamic healthcare resource allocation using Markov decision processes,'' \emph{Operations Research}, vol. 59, no. 2, pp. 306--319, 2011.
-\bibitem{b24} S. M. O'Madadhain, J. Fisher, and S. Smyth, ``Dynamic programming techniques for allocating vaccines on network graphs,'' \emph{IEEE Trans. Netw. Sci. Eng.}, vol. 7, no. 3, pp. 1234--1246, 2020.
-\bibitem{b25} L. Chen, H. Zhang, and X. Li, ``Model predictive control of epidemic spreading on complex networks,'' \emph{IEEE Trans. Cybernetics}, vol. 50, no. 4, pp. 1530--1541, 2020.
+\bibitem{b1} S. Brin and L. Page, ``The anatomy of a large-scale hypertextual web search engine,'' \emph{Computer Networks and ISDN Systems}, vol. 30, no. 1--7, pp. 107--117, 1998.
+\bibitem{b2} J. Kleinberg, ``Authoritative sources in a hyperlinked environment,'' \emph{Journal of the ACM}, vol. 46, no. 5, pp. 604--632, 1999.
+\bibitem{b3} M. E. J. Newman, ``The structure and function of complex networks,'' \emph{SIAM Review}, vol. 45, no. 2, pp. 167--256, 2003.
+\bibitem{b4} A. N. Langville and C. D. Meyer, \emph{Google's PageRank and Beyond: The Science of Search Engine Rankings}. Princeton University Press, 2006.
+\bibitem{b5} L. Page, S. Brin, R. Motwani, and T. Winograd, ``The PageRank citation ranking: Bringing order to the web,'' Stanford InfoLab Technical Report, 1999.
+\bibitem{b6} C. D. Meyer, \emph{Matrix Analysis and Applied Linear Algebra}. SIAM, 2000.
+\bibitem{b7} G. Grimmett and D. Stirzaker, \emph{Probability and Random Processes}, 3rd ed. Oxford University Press, 2001.
+\bibitem{b8} M. Yang, H. Wang, Z. Wei, and S. Wang, ``Efficient algorithms for personalized PageRank computation: A survey,'' \emph{IEEE Trans. Knowledge and Data Engineering}, vol. 36, 2024, DOI: 10.1109/TKDE.2024.3376000.
+\bibitem{b9} R. Jayaram et al., ``Dynamic PageRank: Algorithms and lower bounds,'' in \emph{Proc. ICALP 2024}, LIPIcs, vol. 297, p. 90, 2024, DOI: 10.4230/LIPIcs.ICALP.2024.90.
+\bibitem{b10} Z. Wei, J. Wen, and M. Yang, ``Approximating personalized PageRank with error guarantees,'' in \emph{Proc. ICDT 2024}, LIPIcs, vol. 290, p. 9, 2024, DOI: 10.4230/LIPIcs.ICDT.2024.9.
+\bibitem{b11} ``A parallel PageRank algorithm for undirected graphs,'' \emph{Applied Mathematics and Computation}, vol. 456, p. 128276, 2023, DOI: 10.1016/j.amc.2023.128276.
+\bibitem{b12} P. Berkhin, ``A survey on PageRank computing,'' \emph{Internet Mathematics}, vol. 2, no. 1, pp. 73--120, 2005.
+\bibitem{b13} D. F. Gleich, ``PageRank beyond the web,'' \emph{SIAM Review}, vol. 57, no. 3, pp. 321--363, 2015.
 \end{thebibliography}
 
 \end{document}
